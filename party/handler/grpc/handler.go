@@ -1,4 +1,4 @@
-package http
+package grpcsender
 
 import (
 	"encoding/json"
@@ -7,14 +7,14 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/callisto13/mashed-potatoes/party/httpsender"
+	"github.com/callisto13/mashed-potatoes/party/grpcsender"
 )
 
 type Handler struct {
 	RegisteredProviders map[string]string
 }
 
-var Providers = map[string]string{"jokeprovider": "http://localhost:8080"}
+var Providers = map[string]string{"jokeprovider": "localhost:1430"}
 
 func (h Handler) Enrol(w http.ResponseWriter, req *http.Request) {
 	targetProvider := req.URL.Query().Get("target")
@@ -34,9 +34,9 @@ func (h Handler) Enrol(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	log.Printf("enroling a thing of type %s via http protocol", targetProvider)
+	log.Printf("enroling a thing of type %s via grpc protocol", targetProvider)
 
-	if err := httpsender.SendEvent(target, "enrol"); err != nil {
+	if err := grpcsender.SendEvent(target, "enrol"); err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		log.Println(err)
 

@@ -7,21 +7,16 @@ import (
 	"net/http"
 
 	"github.com/callisto13/mashed-potatoes/party/handler"
+	grpchandler "github.com/callisto13/mashed-potatoes/party/handler/grpc"
 	httphandler "github.com/callisto13/mashed-potatoes/party/handler/http"
 	"github.com/callisto13/mashed-potatoes/party/handler/nats"
 )
 
-const (
-	DEFAULT_NATS_SERVER = "http://localhost:4222"
-)
-
 func main() {
 	var (
-		natsAddress string
-		protocol    string
+		protocol string
 	)
 
-	flag.StringVar(&natsAddress, "nats-address", DEFAULT_NATS_SERVER, "address + port of running NATs service")
 	flag.StringVar(&protocol, "protocol", "", "cloudevent protocol to use")
 
 	flag.Parse()
@@ -32,21 +27,25 @@ func main() {
 	switch protocol {
 	case "nats":
 		h = nats.Handler{
-			NatsAddress: natsAddress,
+			NatsAddress: nats.DEFAULT_NATS_SERVER,
 		}
 	case "http":
 		h = httphandler.Handler{
 			RegisteredProviders: httphandler.Providers,
 		}
+	case "grpc":
+		h = grpchandler.Handler{
+			RegisteredProviders: grpchandler.Providers,
+		}
 	default:
-		log.Fatal("unrecognised protocol, choose 'nats' or 'http'")
+		log.Fatal("unrecognised protocol, choose 'nats', 'http' or 'grpc'")
 	}
 
 	http.HandleFunc("/", ping)
 	http.HandleFunc("/ping", ping)
 	http.HandleFunc("/enrol", h.Enrol)
 
-	log.Println("starting on :8090")
+	log.Println("starting on :8090 with protocol: " + protocol)
 	if err := http.ListenAndServe(":8090", nil); err != nil {
 		log.Fatal("failed to get this party started")
 	}

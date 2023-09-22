@@ -62,4 +62,35 @@ For this party would need to read config at start up to be able to know the
 correct destination of each Provider, so it is slightly more overhead to onboard
 a new one, but not much really.
 
+This is just using http, but we can send grpc data as well in this example.
+
+### grpc example
+
+Start `party` api:
+```
+go run party/main.go --protocol grpc
+```
+
+Start the `jokeprovider`:
+```
+go run jokeprovider/grpc/main.go
+```
+
+Curl the API:
+
+```
+curl localhost:8090/enrol?target=jokeprovider
+```
+
+In this case we are not actually using the cloudevent sdk/system at all, but we
+are using the cloudevent proto definition to be able to send generic data as
+events to providers to process.
+
+To generate the proto files:
+
+```
+cd proto
+protoc --go_out=. --go_opt=paths=source_relative --go-grpc_out=. --go-grpc_opt=paths=source_relative provider.proto
+```
+
 [ce]: https://cloudevents.io/

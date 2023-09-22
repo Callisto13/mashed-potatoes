@@ -9,6 +9,8 @@ import (
 	"github.com/callisto13/mashed-potatoes/party/natsemitter"
 )
 
+const DEFAULT_NATS_SERVER = "http://localhost:4222"
+
 type Handler struct {
 	NatsAddress string
 }
