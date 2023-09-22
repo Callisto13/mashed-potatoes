@@ -3,12 +3,10 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
-	"io/ioutil"
 	"log"
-	"net/http"
 
-	"github.com/callisto13/mashed-potatoes/natsemitter"
+	"github.com/callisto13/mashed-potatoes/jokeprovider/joke"
+	"github.com/callisto13/mashed-potatoes/party/natsemitter"
 	cenats "github.com/cloudevents/sdk-go/protocol/nats/v2"
 	cloudevents "github.com/cloudevents/sdk-go/v2"
 )
@@ -57,7 +55,7 @@ func receive(ctx context.Context, event cloudevents.Event) error {
 
 	switch data.Action {
 	case "enrol":
-		if err := enrol(); err != nil {
+		if err := joke.Enrol(); err != nil {
 			return err
 		}
 	default:
@@ -65,34 +63,6 @@ func receive(ctx context.Context, event cloudevents.Event) error {
 	}
 
 	log.Printf("action %s completed successfully", data.Action)
-
-	return nil
-}
-
-func enrol() error {
-	url := "https://icanhazdadjoke.com/"
-
-	c := http.Client{}
-	req, err := http.NewRequest(http.MethodGet, url, nil)
-	if err != nil {
-		return err
-	}
-
-	req.Header.Set("Accept", "text/plain")
-	req.Header.Set("User-Agent", "github.com/callisto13/mashed-potatoes")
-
-	resp, err := c.Do(req)
-	if err != nil {
-		return err
-	}
-	defer resp.Body.Close()
-
-	body, err := ioutil.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-
-	fmt.Println(string(body))
 
 	return nil
 }

@@ -32,8 +32,8 @@ func SendEvent(server, subject, action string) error {
 	e.SetID(uuid.New().String())
 	e.SetType("com.mashedpotato.party.sent")
 	e.SetTime(time.Now())
-	e.SetSource("https://github.com/callisto13/mashedpotato/natsemitter")
-	if err := e.SetData("application/json", &EventData{
+	e.SetSource("https://github.com/callisto13/mashed-potatoes/party/natsemitter")
+	if err := e.SetData(cloudevents.ApplicationJSON, &EventData{
 		Action: action,
 	}); err != nil {
 		return err
